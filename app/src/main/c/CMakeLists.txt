@@ -5,16 +5,31 @@
 
 cmake_minimum_required(VERSION 3.4.1)
 
-# Creates and names a library, sets it as either STATIC
-# or SHARED, and provides the relative paths to its source code.
-# You can define multiple libraries, and CMake builds them for you.
-# Gradle automatically packages shared libraries with your APK.
+set(OLLVM_PATH ${CMAKE_HOME_DIRECTORY}/../../../../../build/bin)
+set(can_use_assembler TRUE)
+enable_language(ASM)
+
+set(OLLVM_C_COMPILER ${OLLVM_PATH}/clang)
+set(OLLVM_CXX_COMPILER ${OLLVM_PATH}/clang++)
+
+set(OLLVM_C_FLAGS "-mllvm -sub -mllvm -bcf -mllvm -fla")
+
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OLLVM_C_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OLLVM_C_FLAGS}")
+set(CMAKE_C_COMPILER ${OLLVM_C_COMPILER})
+set(CMAKE_CXX_COMPILER ${OLLVM_CXX_COMPILER})
+
+#Set flags to detect arm32 bit or arm64 bit for switching between elf structures
 if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
     add_definitions("-D_32_BIT")
 elseif(${ANDROID_ABI} STREQUAL "arm64-v8a")
     add_definitions("-D_64_BIT")
 endif()
 
+# Creates and names a library, sets it as either STATIC
+# or SHARED, and provides the relative paths to its source code.
+# You can define multiple libraries, and CMake builds them for you.
+# Gradle automatically packages shared libraries with your APK.
 add_library( # Sets the name of the library.
              native-lib
 
@@ -22,7 +37,10 @@ add_library( # Sets the name of the library.
              SHARED
 
              # Provides a relative path to your source file(s).
-             native-lib.c )
+             native-lib.c)
+
+#To include syscalls based on architecture,as defined in MUSL
+target_include_directories(native-lib PRIVATE arch/${ANDROID_ABI})
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
