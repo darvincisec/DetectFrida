@@ -5,6 +5,7 @@
  * This is to avoid easy bypass through libc functions
  */
 
+__attribute__((always_inline))
 static inline size_t
 my_strlcpy(char *dst, const char *src, size_t siz)
 {
@@ -28,6 +29,7 @@ my_strlcpy(char *dst, const char *src, size_t siz)
     return(s - src - 1);	/* count does not include NUL */
 }
 
+__attribute__((always_inline))
 static inline
 size_t my_strlen(const char *s)
 {
@@ -36,6 +38,7 @@ size_t my_strlen(const char *s)
     return len;
 }
 
+__attribute__((always_inline))
 static inline int
 my_strncmp(const char *s1, const char *s2, size_t n)
 {
@@ -50,6 +53,7 @@ my_strncmp(const char *s1, const char *s2, size_t n)
     return (0);
 }
 
+__attribute__((always_inline))
 static inline char *
 my_strstr(const char *s, const char *find)
 {
@@ -69,7 +73,7 @@ my_strstr(const char *s, const char *find)
     return ((char *)s);
 }
 
-
+__attribute__((always_inline))
 static inline
 void*  my_memset(void*  dst, int c, size_t n)
 {
@@ -84,6 +88,7 @@ void*  my_memset(void*  dst, int c, size_t n)
     return dst;
 }
 
+__attribute__((always_inline))
 static inline int
 my_strcmp(const char *s1, const char *s2)
 {
@@ -93,6 +98,7 @@ my_strcmp(const char *s1, const char *s2)
     return (*(unsigned char *)s1 - *(unsigned char *)--s2);
 }
 
+__attribute__((always_inline))
 static inline int my_atoi(const char *s)
 {
     int n=0, neg=0;

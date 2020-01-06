@@ -56,6 +56,7 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 #define R7_OPERAND "r"(r7)
 #endif
 
+__attribute__((always_inline))
 static inline long __syscall0(long n)
 {
 	register long r7 __ASM____R7__ = n;
@@ -63,6 +64,7 @@ static inline long __syscall0(long n)
 	__asm_syscall(R7_OPERAND);
 }
 
+__attribute__((always_inline))
 static inline long __syscall1(long n, long a)
 {
 	register long r7 __ASM____R7__ = n;
@@ -70,6 +72,7 @@ static inline long __syscall1(long n, long a)
 	__asm_syscall(R7_OPERAND, "0"(r0));
 }
 
+__attribute__((always_inline))
 static inline long __syscall2(long n, long a, long b)
 {
 	register long r7 __ASM____R7__ = n;
@@ -78,6 +81,7 @@ static inline long __syscall2(long n, long a, long b)
 	__asm_syscall(R7_OPERAND, "0"(r0), "r"(r1));
 }
 
+__attribute__((always_inline))
 static inline long __syscall3(long n, long a, long b, long c)
 {
 	register long r7 __ASM____R7__ = n;
@@ -87,6 +91,7 @@ static inline long __syscall3(long n, long a, long b, long c)
 	__asm_syscall(R7_OPERAND, "0"(r0), "r"(r1), "r"(r2));
 }
 
+__attribute__((always_inline))
 static inline long __syscall4(long n, long a, long b, long c, long d)
 {
 	register long r7 __ASM____R7__ = n;
@@ -97,6 +102,7 @@ static inline long __syscall4(long n, long a, long b, long c, long d)
 	__asm_syscall(R7_OPERAND, "0"(r0), "r"(r1), "r"(r2), "r"(r3));
 }
 
+__attribute__((always_inline))
 static inline long __syscall5(long n, long a, long b, long c, long d, long e)
 {
 	register long r7 __ASM____R7__ = n;
@@ -108,6 +114,7 @@ static inline long __syscall5(long n, long a, long b, long c, long d, long e)
 	__asm_syscall(R7_OPERAND, "0"(r0), "r"(r1), "r"(r2), "r"(r3), "r"(r4));
 }
 
+__attribute__((always_inline))
 static inline long __syscall6(long n, long a, long b, long c, long d, long e, long f)
 {
 	register long r7 __ASM____R7__ = n;

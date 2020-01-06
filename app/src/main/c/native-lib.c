@@ -20,16 +20,16 @@
 #include "syscalls.h"
 #include "mylibc.h"
 
-#define APPNAME "DetectFrida"
 #define MAX_LINE 512
 #define MAX_LENGTH 256
-#define FRIDA_THREAD_GUM_JS_LOOP "gum-js-loop"
-#define FRIDA_THREAD_GMAIN "gmain"
-#define FRIDA_NAMEDPIPE_LINJECTOR "linjector"
-#define PROC_MAPS "/proc/self/maps"
-#define PROC_STATUS "/proc/self/task/%s/status"
-#define PROC_FD "/proc/self/fd"
-#define PROC_TASK "/proc/self/task"
+static const char* APPNAME = "DetectFrida";
+static const char* FRIDA_THREAD_GUM_JS_LOOP = "gum-js-loop";
+static const char* FRIDA_THREAD_GMAIN = "gmain";
+static const char* FRIDA_NAMEDPIPE_LINJECTOR = "linjector";
+static const char* PROC_MAPS = "/proc/self/maps";
+static const char* PROC_STATUS = "/proc/self/task/%s/status";
+static const char* PROC_FD = "/proc/self/fd";
+static const char* PROC_TASK = "/proc/self/task";
 
 
 //Structure to hold the checksum of executable section of library
@@ -67,6 +67,7 @@ void detectfrida(){
 
     char* filePaths[NUM_LIBS];
     parse_proc_maps_to_fetch_path(filePaths);
+    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Libc[%x][%x][%x][%x][%x][%x]", __NR_openat, __NR_lseek, __NR_read, __NR_close, __NR_readlinkat, __NR_nanosleep);
     for(int i = 0; i < NUM_LIBS; i++) {
         fetch_checksum_of_library(filePaths[i], &elfSectionArr[i]);
         if(filePaths[i] != NULL)
@@ -77,6 +78,7 @@ void detectfrida(){
 
 }
 
+__attribute__((always_inline))
 static inline void parse_proc_maps_to_fetch_path(char** filepaths){
     int fd = 0;
     char map[MAX_LINE];
@@ -105,6 +107,7 @@ static inline void parse_proc_maps_to_fetch_path(char** filepaths){
     }
 }
 
+__attribute__((always_inline))
 static inline bool fetch_checksum_of_library(const char* filePath, textSection** pTextSection){
 
     Elf_Ehdr ehdr;
@@ -186,6 +189,7 @@ void detect_frida_loop(void* pargs) {
     }
 }
 
+__attribute__((always_inline))
 static inline bool scan_executable_segments(char* map, textSection* pElfSectArr){
     unsigned long start, end;
     char buf[MAX_LINE]="";
@@ -212,6 +216,7 @@ static inline bool scan_executable_segments(char* map, textSection* pElfSectArr)
     return false;
 }
 
+__attribute__((always_inline))
 static inline ssize_t read_one_line(int fd, char *buf, unsigned int max_len) {
     char b;
     ssize_t ret;
@@ -243,6 +248,7 @@ static inline ssize_t read_one_line(int fd, char *buf, unsigned int max_len) {
     return bytes_read;
 }
 
+__attribute__((always_inline))
 static inline unsigned long checksum(void *buffer, size_t len)
 {
     unsigned long seed = 0;
@@ -253,6 +259,7 @@ static inline unsigned long checksum(void *buffer, size_t len)
     return seed;
 }
 
+__attribute__((always_inline))
 static inline void detect_frida_threads(){
 
     DIR *dir = opendir(PROC_TASK);
@@ -288,6 +295,7 @@ static inline void detect_frida_threads(){
 
 }
 
+__attribute__((always_inline))
 static inline void detect_frida_namedpipe(){
 
     DIR *dir = opendir(PROC_FD);

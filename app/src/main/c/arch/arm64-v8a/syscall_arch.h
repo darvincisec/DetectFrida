@@ -29,6 +29,7 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 	return x0; \
 	} while (0)
 
+__attribute__((always_inline))
 static inline long __syscall0(long n)
 {
 	register long x8 __asm__("x8") = n;
@@ -36,13 +37,14 @@ static inline long __syscall0(long n)
 	__asm_syscall("r"(x8));
 }
 
+__attribute__((always_inline))
 static inline long __syscall1(long n, long a)
 {
 	register long x8 __asm__("x8") = n;
 	register long x0 __asm__("x0") = a;
 	__asm_syscall("r"(x8), "0"(x0));
 }
-
+__attribute__((always_inline))
 static inline long __syscall2(long n, long a, long b)
 {
 	register long x8 __asm__("x8") = n;
@@ -50,7 +52,7 @@ static inline long __syscall2(long n, long a, long b)
 	register long x1 __asm__("x1") = b;
 	__asm_syscall("r"(x8), "0"(x0), "r"(x1));
 }
-
+__attribute__((always_inline))
 static inline long __syscall3(long n, long a, long b, long c)
 {
 	register long x8 __asm__("x8") = n;
@@ -59,7 +61,7 @@ static inline long __syscall3(long n, long a, long b, long c)
 	register long x2 __asm__("x2") = c;
 	__asm_syscall("r"(x8), "0"(x0), "r"(x1), "r"(x2));
 }
-
+__attribute__((always_inline))
 static inline long __syscall4(long n, long a, long b, long c, long d)
 {
 	register long x8 __asm__("x8") = n;
@@ -70,6 +72,7 @@ static inline long __syscall4(long n, long a, long b, long c, long d)
 	__asm_syscall("r"(x8), "0"(x0), "r"(x1), "r"(x2), "r"(x3));
 }
 
+__attribute__((always_inline))
 static inline long __syscall5(long n, long a, long b, long c, long d, long e)
 {
 	register long x8 __asm__("x8") = n;
@@ -81,6 +84,7 @@ static inline long __syscall5(long n, long a, long b, long c, long d, long e)
 	__asm_syscall("r"(x8), "0"(x0), "r"(x1), "r"(x2), "r"(x3), "r"(x4));
 }
 
+__attribute__((always_inline))
 static inline long __syscall6(long n, long a, long b, long c, long d, long e, long f)
 {
 	register long x8 __asm__("x8") = n;
