@@ -2,7 +2,7 @@
 This project has 3 ways to detect frida hooking
 a. Detect through named pipes used by Frida
 b. Detect through frida specific named thread
-c. Compare text section tampering with text section in disk
+c. Compare text section in memory with text section in disk
 
 More details can be found @ https://darvincitech.wordpress.com/2019/12/23/detect-frida-for-android/
 
