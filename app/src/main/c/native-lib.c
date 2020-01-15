@@ -60,14 +60,16 @@ static inline ssize_t read_one_line(int fd, char *buf, unsigned int max_len);
 static inline unsigned long checksum(void *buffer, size_t len);
 static inline void detect_frida_threads();
 static inline void detect_frida_namedpipe();
+static inline void detect_frida_memdiskcompare();
 
 //Upon loading the library, this function annotated as constructor starts executing
 __attribute__((constructor))
 void detectfrida(){
 
     char* filePaths[NUM_LIBS];
+
     parse_proc_maps_to_fetch_path(filePaths);
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Libc[%x][%x][%x][%x][%x][%x]", __NR_openat, __NR_lseek, __NR_read, __NR_close, __NR_readlinkat, __NR_nanosleep);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Libc[%x][%x][%x][%x][%x][%x]", __NR_openat, __NR_lseek, __NR_read, __NR_close, __NR_readlinkat, __NR_nanosleep);
     for(int i = 0; i < NUM_LIBS; i++) {
         fetch_checksum_of_library(filePaths[i], &elfSectionArr[i]);
         if(filePaths[i] != NULL)
@@ -156,33 +158,16 @@ static inline bool fetch_checksum_of_library(const char* filePath, textSection**
 
 
 void detect_frida_loop(void* pargs) {
-    int fd = 0;
-    char map[MAX_LINE];
+
     struct timespec timereq;
-    timereq.tv_sec = 1;
+    timereq.tv_sec = 5; //Changing to 5 seconds from 1 second
     timereq.tv_nsec = 0;
 
     while (1) {
 
         detect_frida_threads();
         detect_frida_namedpipe();
-
-        if ((fd = my_openat(AT_FDCWD, PROC_MAPS, O_RDONLY | O_CLOEXEC, 0 )) != 0) {
-
-            while ((read_one_line(fd, map, MAX_LINE)) > 0) {
-                for(int i = 0; i < NUM_LIBS; i++) {
-                    if (my_strstr(map, libstocheck[i]) != NULL) {
-                        if (true == scan_executable_segments(map, elfSectionArr[i])) {
-                            break;
-                        }
-                    }
-                }
-            }
-        } else {
-            __android_log_print(ANDROID_LOG_WARN, APPNAME, "Error opening /proc/self/maps. That's usually a bad sign.");
-
-        }
-        my_close(fd);
+        detect_frida_memdiskcompare();
 
         my_nanosleep(&timereq, NULL);
 
@@ -198,17 +183,22 @@ static inline bool scan_executable_segments(char* map, textSection* pElfSectArr)
 
     sscanf(map, "%lx-%lx %s %s %s %s %s", &start, &end, buf, tmp, tmp, tmp, path );
 
-    if (buf[2] == 'x') {
-        uint8_t* buffer = (uint8_t*)start;
-        unsigned long memsize = end - start;
-        if(memsize >= pElfSectArr->memsize)
-            memsize = pElfSectArr->memsize;
-        unsigned long output = checksum(buffer, memsize);
-        //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME,  "Buffer Size[%ld][%ld]",pElfSectArr->checksum, output);
-        if(output != pElfSectArr->checksum){
-            __android_log_print(ANDROID_LOG_WARN, APPNAME,  "Executable Section Manipulated, "
+    if (buf[2] == 'x' ) {
+        if(buf[0] == 'r') {
+            uint8_t *buffer = (uint8_t *) start;
+            unsigned long memsize = end - start;
+            if (memsize >= pElfSectArr->memsize)
+                memsize = pElfSectArr->memsize;
+            unsigned long output = checksum(buffer, memsize);
+            //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME,  "Buffer Size[%ld][%ld]",pElfSectArr->checksum, output);
+            if (output != pElfSectArr->checksum) {
+                __android_log_print(ANDROID_LOG_WARN, APPNAME, "Executable Section Manipulated, "
                                                                "maybe due to Frida or other hooking framework."
-                                                              "Act Now!!!");
+                                                               "Act Now!!!");
+            }
+        }else{
+            //TODO: try mprotect
+            __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Executable Section not readable! " );
         }
         return true;
     }
@@ -322,5 +312,27 @@ static inline void detect_frida_namedpipe(){
     }
     closedir(dir);
 }
+__attribute__((always_inline))
+static inline void detect_frida_memdiskcompare(){
+    int fd = 0;
+    char map[MAX_LINE];
 
+    if ((fd = my_openat(AT_FDCWD, PROC_MAPS, O_RDONLY | O_CLOEXEC, 0 )) != 0) {
+
+        while ((read_one_line(fd, map, MAX_LINE)) > 0) {
+            for(int i = 0; i < NUM_LIBS; i++) {
+                if (my_strstr(map, libstocheck[i]) != NULL) {
+                    if (true == scan_executable_segments(map, elfSectionArr[i])) {
+                        break;
+                    }
+                }
+            }
+        }
+    } else {
+        __android_log_print(ANDROID_LOG_WARN, APPNAME, "Error opening /proc/self/maps. That's usually a bad sign.");
+
+    }
+    my_close(fd);
+
+}
 

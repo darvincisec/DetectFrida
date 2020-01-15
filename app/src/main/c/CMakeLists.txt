@@ -20,9 +20,9 @@ set(CMAKE_C_COMPILER ${OLLVM_C_COMPILER})
 set(CMAKE_CXX_COMPILER ${OLLVM_CXX_COMPILER})
 
 #Set flags to detect arm32 bit or arm64 bit for switching between elf structures
-if(${ANDROID_ABI} STREQUAL "armeabi-v7a")
+if(${ANDROID_ABI} STREQUAL "armeabi-v7a" OR ${ANDROID_ABI} STREQUAL "x86")
     add_definitions("-D_32_BIT")
-elseif(${ANDROID_ABI} STREQUAL "arm64-v8a")
+elseif(${ANDROID_ABI} STREQUAL "arm64-v8a" OR ${ANDROID_ABI} STREQUAL "x86_64")
     add_definitions("-D_64_BIT")
 endif()
 
@@ -61,3 +61,8 @@ target_link_libraries( # Specifies the target library.
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
+
+add_custom_command( TARGET native-lib
+        POST_BUILD
+        COMMAND "${ANDROID_TOOLCHAIN_PREFIX}strip" -R .comment -g -S -d --strip-unneeded ${CMAKE_HOME_DIRECTORY}/../../../build/intermediates/cmake/${CMAKE_BUILD_TYPE}/obj/${ANDROID_ABI}/libnative-lib.so
+        COMMENT "Stripped native library")
