@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.4.1)
 set(can_use_assembler TRUE)
 enable_language(ASM)
 
-set(OLLVM_PATH ${CMAKE_HOME_DIRECTORY}/../../../../../build/bin)
+set(OLLVM_PATH ${CMAKE_HOME_DIRECTORY}/../../../../../o-llvm-binary/ollvm-tll/build/bin_Darwin)
 set(OLLVM_C_COMPILER ${OLLVM_PATH}/clang)
 set(OLLVM_CXX_COMPILER ${OLLVM_PATH}/clang++)
 
