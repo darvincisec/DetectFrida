@@ -217,7 +217,7 @@ scan_executable_segments(char *map, execSection *pElfSectArr, const char *librar
     char tmp[100] = "";
 
     sscanf(map, "%lx-%lx %s %s %s %s %s", &start, &end, buf, tmp, tmp, tmp, path);
-    __android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Map [%s]", map);
+    //__android_log_print(ANDROID_LOG_VERBOSE, APPNAME, "Map [%s]", map);
 
     if (buf[2] == 'x') {
         if (buf[0] == 'r') {
